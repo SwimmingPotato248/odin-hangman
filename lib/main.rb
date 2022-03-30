@@ -22,6 +22,15 @@ class Hangman
         @display = Array.new(@key.length, "_")
     end
 
+    def save(data)
+        save_file = File.open("save.txt", "w")
+        save_file.write(YAML.dump(data))
+    end
+
+    def load()
+        return YAML.load_file("save.txt")
+    end
+
     def play_game
         lives = 6
         generate_key()
@@ -33,6 +42,18 @@ class Hangman
             puts "Incorrect guesses left: #{lives}"
             puts "Guessed letters: #{guessed.sort.join(" ")}"
             guess = gets.chomp
+            if guess == "save"
+                save([@key, @display, guessed, lives])
+                next
+            end
+            if guess == "load"
+                save_file = load()
+                @key = save_file[0]
+                @display = save_file[1]
+                guessed = save_file[2]
+                lives = save_file[3]
+                next
+            end
             guessed.push(guess)
             if !@key.include?(guess)
                 lives -= 1
